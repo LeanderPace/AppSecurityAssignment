@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "ShoppingCart.Application": {
+      "commandName": "Project"
+    }
+  }
+}
