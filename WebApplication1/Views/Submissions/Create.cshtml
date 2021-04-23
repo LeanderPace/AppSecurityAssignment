@@ -1,0 +1,49 @@
+﻿@model ShoppingCart.Application.ViewModels.SubmissionViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>SubmissionViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="studentName" class="control-label"></label>
+                <input asp-for="studentName" class="form-control" />
+                <span asp-validation-for="studentName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="studentSurname" class="control-label"></label>
+                <input asp-for="studentSurname" class="form-control" />
+                <span asp-validation-for="studentSurname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="email" class="control-label"></label>
+                <input asp-for="email" class="form-control" />
+                <span asp-validation-for="email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="file" class="control-label"></label>
+                <input type="file" name="file" class="form-control" />
+                <span asp-validation-for="file" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

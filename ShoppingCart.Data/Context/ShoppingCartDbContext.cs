@@ -16,6 +16,7 @@ namespace ShoppingCart.Data.Context
         public DbSet<Category> Categories { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<Task> Tasks { get; set; }
+        public DbSet<Submission> Submissions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

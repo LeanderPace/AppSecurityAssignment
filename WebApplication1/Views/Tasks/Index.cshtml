@@ -9,57 +9,28 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.issueDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.deadline)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.surname)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.email)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.issueDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.deadline)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.surname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.email)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-4">
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Assignment Name</h5>
+                    <p class="card-text">Description: @item.description.</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Issue Date: @item.issueDate</li>
+                    <li class="list-group-item">Deadline Date: @item.deadline</li>
+                    <li class="list-group-item">Lecturer Name: @item.name @item.surname</li>
+                    <li class="list-group-item">Lecturer Email: @item.email</li>
+                </ul>
+                <div class="card-body">
+                    <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+

@@ -14,13 +14,11 @@ namespace WebApplication1.Controllers
     public class TasksController : Controller
     {
         private readonly ITasksService _taskService;
-        private readonly IWebHostEnvironment _host;
         private readonly ILogger<TasksController> _logger;
 
-        public TasksController(ITasksService taskService, IWebHostEnvironment host, ILogger<TasksController> logger)
+        public TasksController(ITasksService taskService, ILogger<TasksController> logger)
         {
             _taskService = taskService;
-            _host = host;
             _logger = logger;
         }
 
