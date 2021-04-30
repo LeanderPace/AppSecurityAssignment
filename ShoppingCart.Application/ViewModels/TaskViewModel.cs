@@ -7,6 +7,7 @@ namespace ShoppingCart.Application.ViewModels
     public class TaskViewModel
     {
         public Guid id { get; set; }
+        public string taskName { get; set; }
         public string description { get; set; }
         public DateTime issueDate { get; set; }
         public DateTime deadline { get; set; }

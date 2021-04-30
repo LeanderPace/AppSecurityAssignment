@@ -27,6 +27,11 @@ namespace ShoppingCart.Application.Services
             _taskRepo.AddTask(_autoMapper.Map<Task>(model));
         }
 
+        public void DeleteTask(Guid id)
+        {
+            _taskRepo.DeleteTask(id);
+        }
+
         public TaskViewModel GetTask(Guid id)
         {
             var task = _taskRepo.GetTask(id);

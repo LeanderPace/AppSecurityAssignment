@@ -11,25 +11,24 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" enctype="multipart/form-data">
-
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="studentName" class="control-label"></label>
+                <label class="control-label">Student Name</label>
                 <input asp-for="studentName" class="form-control" />
                 <span asp-validation-for="studentName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="studentSurname" class="control-label"></label>
+                <label class="control-label">Student Surname</label>
                 <input asp-for="studentSurname" class="form-control" />
                 <span asp-validation-for="studentSurname" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="email" class="control-label"></label>
-                <input asp-for="email" class="form-control" />
+                <label class="control-label">Student Email</label>
+                <input asp-for="@User.Identity.Name" class="form-control" readonly/>
                 <span asp-validation-for="email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="file" class="control-label"></label>
+                <label class="control-label">File</label>
                 <input type="file" name="file" class="form-control" />
                 <span asp-validation-for="file" class="text-danger"></span>
             </div>

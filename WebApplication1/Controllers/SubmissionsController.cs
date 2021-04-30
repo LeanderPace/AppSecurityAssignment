@@ -44,11 +44,14 @@ namespace WebApplication1.Controllers
         //[Authorize]
         public IActionResult Create(IFormFile file, SubmissionViewModel data, Guid id)
         {
-            data.task = _tasksService.GetTask(id);
+           
 
             if (ModelState.IsValid)
             {
+                data.task = _tasksService.GetTask(id);
+
                 string uniqueFilename;
+
                 if (System.IO.Path.GetExtension(file.FileName) == ".pdf" && file.Length < 1048576)
                 {
                     byte[] whiteList = new byte[] { 37, 80, 68, 70 };
@@ -112,6 +115,21 @@ namespace WebApplication1.Controllers
                 ModelState.AddModelError("", "Check your input. Operation failed");
                 return View(data);
             }
+        }
+        public IActionResult Details(Guid id)
+        {
+            try
+            {
+                _logger.LogInformation("Accessing Information of Submission " + id);
+                var mySubmission = _submissionService.GetSubmission(id);
+                return View(mySubmission);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return RedirectToAction("Error");
+            }
+
         }
     }
 }

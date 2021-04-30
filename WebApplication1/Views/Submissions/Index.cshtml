@@ -4,50 +4,25 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>My Submissions</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.studentName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.studentSurname)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.file)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.studentName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.studentSurname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.file)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    @foreach (var item in Model)
+    {
+    <div class="col-8 mt-2">
+        <div class="list-group">
+            <a href="submissions/Details?id=@item.id" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">@item.task.taskName</h5>
+                    <small>@item.task.name @item.task.surname</small>
+                </div>
+                <p class="mb-1">@item.task.description</p>
+                <small>@item.file</small>
+            </a>
+        </div>
+    </div>
+    <div class="col-4">
+        <a href="comments/create?id=@item.id" class="btn btn-primary">View/Post Comments</a>
+    </div>
+    }
+</div>

@@ -52,5 +52,23 @@ namespace WebApplication1.Controllers
                 return View(data);
             }
         }
+
+        public IActionResult Delete(Guid id)
+        {
+            try
+            {
+                _taskService.DeleteTask(id);
+                TempData["feedback"] = "Product was deleted successfully";
+                _logger.LogInformation("Successfully Deleted Task " + id);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["danger"] = "Something went wrong";
+                _logger.LogError(ex.Message);
+                return RedirectToAction("Index");
+            }
+        }
+        
     }
 }

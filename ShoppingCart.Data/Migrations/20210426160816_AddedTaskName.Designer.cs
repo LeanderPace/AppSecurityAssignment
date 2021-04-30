@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShoppingCart.Data.Context;
 
 namespace ShoppingCart.Data.Migrations
 {
     [DbContext(typeof(ShoppingCartDbContext))]
-    partial class ShoppingCartDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210426160816_AddedTaskName")]
+    partial class AddedTaskName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,28 +35,6 @@ namespace ShoppingCart.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("ShoppingCart.Domain.Models.Comment", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SubmissionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("commentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("SubmissionId");
-
-                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("ShoppingCart.Domain.Models.Member", b =>
@@ -167,15 +147,6 @@ namespace ShoppingCart.Data.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Tasks");
-                });
-
-            modelBuilder.Entity("ShoppingCart.Domain.Models.Comment", b =>
-                {
-                    b.HasOne("ShoppingCart.Domain.Models.Submission", "submission")
-                        .WithMany()
-                        .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ShoppingCart.Domain.Models.Product", b =>

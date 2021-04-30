@@ -1,0 +1,75 @@
+﻿@model ShoppingCart.Application.ViewModels.SubmissionViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>SubmissionViewModel</h4>
+
+    <hr />
+
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <dt class="col-sm-4">
+                        Student Name:
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.studentName) @Html.DisplayFor(model => model.studentSurname)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Student Email:
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.email)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Uploaded File:
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.file)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Issue Date:
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.task.issueDate)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Deadline Date:
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.task.deadline)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Lecturer Name:
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.task.name) @Html.DisplayFor(model => model.task.surname)
+                    </dd>
+                    <dt class="col-sm-4">
+                        Lecturer Email:
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.task.email)
+                    </dd>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label">Comments</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+

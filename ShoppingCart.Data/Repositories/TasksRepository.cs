@@ -27,6 +27,14 @@ namespace ShoppingCart.Data.Repositories
             return task.id;
         }
 
+        public void DeleteTask(Guid id)
+        {
+            Task t = GetTask(id);
+            _context.Tasks.Remove(t);
+            _context.SaveChanges();
+            
+        }
+
         public Task GetTask(Guid id)
         {
             return _context.Tasks.SingleOrDefault(x => x.id == id);

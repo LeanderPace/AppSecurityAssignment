@@ -54,6 +54,9 @@ namespace ShoppingCart.IOC
             services.AddScoped<ISubmissionsRepository, SubmissionsRepository>();
             services.AddScoped<ISubmissionsService, SubmissionsService>();
 
+            services.AddScoped<ICommentsRepository, CommentsRepository>();
+            services.AddScoped<ICommentsService, CommentsService>();
+
             services.AddAutoMapper(typeof(AutoMapperConfiguration));
             AutoMapperConfiguration.RegisterMappings();
 

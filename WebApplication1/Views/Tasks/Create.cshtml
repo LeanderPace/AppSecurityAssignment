@@ -13,33 +13,38 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="description" class="control-label"></label>
+                <label class="control-label">Assignment Name</label>
+                <input asp-for="taskName" class="form-control" />
+                <span asp-validation-for="taskName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Assignment Description</label>
                 <input asp-for="description" class="form-control" />
                 <span asp-validation-for="description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="issueDate" class="control-label"></label>
+                <label class="control-label">Issued Date</label>
                 <input asp-for="issueDate" class="form-control" />
                 <span asp-validation-for="issueDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="deadline" class="control-label"></label>
+                <label class="control-label">Deadline Date</label>
                 <input asp-for="deadline" class="form-control" />
                 <span asp-validation-for="deadline" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="name" class="control-label"></label>
+                <label class="control-label">Lecturer Name</label>
                 <input asp-for="name" class="form-control" />
                 <span asp-validation-for="name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="surname" class="control-label"></label>
+                <label class="control-label">Lecturer Surname</label>
                 <input asp-for="surname" class="form-control" />
                 <span asp-validation-for="surname" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="email" class="control-label"></label>
-                <input asp-for="email" class="form-control" />
+                <label class="control-label">Lecturer Email</label>
+                <input asp-for="@User.Identity.Name" class="form-control" readonly/>
                 <span asp-validation-for="email" class="text-danger"></span>
             </div>
             <div class="form-group">

@@ -7,7 +7,7 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Create New Task</a>
 </p>
 
 <div class="row">
@@ -16,7 +16,7 @@
         <div class="col-4">
             <div class="card" style="width: 18rem;">
                 <div class="card-body">
-                    <h5 class="card-title">Assignment Name</h5>
+                    <h5 class="card-title">@item.taskName</h5>
                     <p class="card-text">Description: @item.description.</p>
                 </div>
                 <ul class="list-group list-group-flush">
@@ -27,6 +27,7 @@
                 </ul>
                 <div class="card-body">
                     <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
+                    <a>@Html.ActionLink("Delete", "delete", "tasks", new { id = item.id })</a>
                 </div>
             </div>
         </div>

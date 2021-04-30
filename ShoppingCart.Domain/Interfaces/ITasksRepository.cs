@@ -11,5 +11,6 @@ namespace ShoppingCart.Domain.Interfaces
         Task GetTask(Guid id);
         IQueryable<Task> GetTasks();
         Guid AddTask(Task task);
+        void DeleteTask(Guid id);
     }
 }

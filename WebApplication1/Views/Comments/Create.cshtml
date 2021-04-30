@@ -1,0 +1,53 @@
+﻿@model ShoppingCart.Application.ViewModels.CommentViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Comments</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input asp-for="content" class="form-control" placeholder="Type a comment"/>
+                <span asp-validation-for="content" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Post" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a>@Html.ActionLink("Back to list", "index", "submissions", new { /**/ })</a>
+</div>
+
+<hr />
+
+<div class="row">
+    @foreach (var comment in ViewBag.Comments)
+    {
+    <div class="col-12 mt-2">
+        <div class="card">
+            <div class="card-header">
+                Quote
+            </div>
+            <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                    <p>@comment.content</p>
+                    <footer class="blockquote-footer">@comment.commentDate</footer>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

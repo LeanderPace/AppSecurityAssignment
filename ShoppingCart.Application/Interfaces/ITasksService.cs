@@ -11,5 +11,6 @@ namespace ShoppingCart.Application.Interfaces
         IQueryable<TaskViewModel> GetTasks();
         TaskViewModel GetTask(Guid id);
         void AddTask(TaskViewModel model);
+        void DeleteTask(Guid id);
     }
 }
