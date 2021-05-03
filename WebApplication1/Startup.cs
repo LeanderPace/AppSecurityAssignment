@@ -50,9 +50,7 @@ namespace WebApplication1
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            //restrict the no. of times the user is allowed to guess his/her password
-
-
+            /*restrict the no. of times the user is allowed to guess his/her password
 
             services.Configure<IdentityOptions>(
                  options =>
@@ -61,7 +59,7 @@ namespace WebApplication1
                      options.Password.RequiredLength = 8;
                      options.Lockout.MaxFailedAccessAttempts = 5;
                  }
-                );
+                ); */
 
             DependencyContainer.RegisterServices(services, Configuration.GetConnectionString("DefaultConnection"));
 

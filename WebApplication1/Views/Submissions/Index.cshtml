@@ -22,7 +22,8 @@
         </div>
     </div>
     <div class="col-4">
-        <a href="comments/create?id=@item.id" class="btn btn-primary">View/Post Comments</a>
+        <!--<a href="comments/create?id=@item.id" class="btn btn-primary">View/Post Comments</a>-->
+        @Html.ActionLink("Comments", "Create", "Comments", new { id = item.id }) 
     </div>
     }
 </div>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,8 @@ namespace WebApplication1.Controllers
         private readonly IWebHostEnvironment _host;
         private readonly ILogger<SubmissionsController> _logger;
 
-        public SubmissionsController(ISubmissionsService submissionService, ITasksService tasksService, IWebHostEnvironment host, ILogger<SubmissionsController> logger)
+        public SubmissionsController(ISubmissionsService submissionService, ITasksService tasksService, 
+            IWebHostEnvironment host, ILogger<SubmissionsController> logger)
         {
             _submissionService = submissionService;
             _tasksService = tasksService;
@@ -34,81 +36,93 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         //[Authorize]
         public IActionResult Create(IFormFile file, SubmissionViewModel data, Guid id)
         {
-           
 
             if (ModelState.IsValid)
             {
                 data.task = _tasksService.GetTask(id);
 
-                string uniqueFilename;
-
-                if (System.IO.Path.GetExtension(file.FileName) == ".pdf" && file.Length < 1048576)
+                if(data.task.deadline > DateTime.Now)
                 {
-                    byte[] whiteList = new byte[] { 37, 80, 68, 70 };
-                    if (file != null)
+                    data.task = _tasksService.GetTask(id);
+
+                    string uniqueFilename;
+
+                    if (System.IO.Path.GetExtension(file.FileName) == ".pdf" && file.Length < 1048576)
                     {
-                        using (var f = file.OpenReadStream())
+                        byte[] whiteList = new byte[] { 37, 80, 68, 70 };
+                        if (file != null)
                         {
-                            byte[] buffer = new byte[4];
-                            f.Read(buffer, 0, 4);
-
-                            for (int i = 0; i < whiteList.Length; i++)
+                            using (var f = file.OpenReadStream())
                             {
-                                if (whiteList[i] == buffer[i])
-                                { }
-                                else
+                                byte[] buffer = new byte[4];
+                                f.Read(buffer, 0, 4);
+
+                                for (int i = 0; i < whiteList.Length; i++)
                                 {
-                                    ModelState.AddModelError("file", "file is not valid and accapteable");
-                                    return View();
+                                    if (whiteList[i] == buffer[i])
+                                    { }
+                                    else
+                                    {
+                                        ModelState.AddModelError("file", "file is not valid and accapteable");
+                                        return View();
+                                    }
                                 }
-                            }
 
-                            f.Position = 0;
+                                f.Position = 0;
 
-                            uniqueFilename = Guid.NewGuid() + Path.GetExtension(file.FileName);
-                            data.file = uniqueFilename;
+                                uniqueFilename = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                                data.file = uniqueFilename;
 
-                            string absolutePath = _host.WebRootPath + @"\files" + uniqueFilename;
+                                string absolutePath = _host.WebRootPath + @"\files" + uniqueFilename;
 
-                            try
-                            {
-                                using (FileStream fsOut = new FileStream(absolutePath, FileMode.CreateNew, FileAccess.Write))
+                                try
                                 {
-                                    f.CopyTo(fsOut);
+                                    using (FileStream fsOut = new FileStream(absolutePath, FileMode.CreateNew, FileAccess.Write))
+                                    {
+                                        f.CopyTo(fsOut);
+                                    }
+                                    f.Close();
                                 }
-                                f.Close();
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError(ex, "Error happend while saving file");
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "Error happend while saving file");
 
-                                return View("Error", new ErrorViewModel() { Message = "Error while saving the file. Try again later" });
+                                    return View("Error", new ErrorViewModel() { Message = "Error while saving the file. Try again later" });
+                                }
                             }
                         }
                     }
-                } 
-                else
-                {
-                    ModelState.AddModelError("file", "File is not valid and acceptable or size is greater than 10Mb");
+                    else
+                    {
+                        ModelState.AddModelError("file", "File is not valid and acceptable or size is greater than 10Mb");
+                        return View();
+                    }
+
+                    data.email = HttpContext.User.Identity.Name;
+
+                    _submissionService.AddSubmission(data);
+
+                    TempData["message"] = "Document submitted successfully";
                     return View();
                 }
-
-                data.email = HttpContext.User.Identity.Name;
-
-                _submissionService.AddSubmission(data);
-
-                TempData["message"] = "Document submitted successfully";
-                return View();
+                else
+                {
+                    TempData["error"] = "Deadline date overdue";
+                    return View();
+                }
+    
             }
             else
             {
@@ -116,6 +130,8 @@ namespace WebApplication1.Controllers
                 return View(data);
             }
         }
+
+        [Authorize]
         public IActionResult Details(Guid id)
         {
             try

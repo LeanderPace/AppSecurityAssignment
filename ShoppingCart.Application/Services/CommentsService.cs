@@ -25,7 +25,7 @@ namespace ShoppingCart.Application.Services
         {
             var comm = _autoMapper.Map<Comment>(model);
             comm.SubmissionId = comm.submission.id;
-            comm.submission = null;
+            comm.submission = null; 
             comm.commentDate = createdDate;
 
             _commentRepo.AddComment(comm);

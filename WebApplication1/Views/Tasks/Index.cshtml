@@ -4,11 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Tasks</h1>
 
-<p>
-    <a asp-action="Create">Create New Task</a>
-</p>
+@if (User.IsInRole("teacher"))
+{
+    <p> <a asp-action="Create">Create New Task</a> </p>
+}
+
 
 <div class="row">
     @foreach (var item in Model)
@@ -26,8 +28,17 @@
                     <li class="list-group-item">Lecturer Email: @item.email</li>
                 </ul>
                 <div class="card-body">
-                    <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
-                    <a>@Html.ActionLink("Delete", "delete", "tasks", new { id = item.id })</a>
+                    @if (User.IsInRole("teacher"))
+                    {
+                        <a>@Html.ActionLink("Delete", "delete", "tasks", new { id = item.id })</a>
+                        <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
+                    }
+
+                    @if (User.IsInRole("student"))
+                    {
+                        <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
+                    }
+
                 </div>
             </div>
         </div>

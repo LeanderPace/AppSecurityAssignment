@@ -25,16 +25,23 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="Index">Tasks</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="Create">Add Task</a>
-                        </li>
+                        @if (User.IsInRole("teacher"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tasks" asp-action="Create">Add Task</a>
+                            </li>}
+
+                        @if (User.IsInRole("student"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Submissions" asp-action="Index">My Submissions</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-
-
 
     <div class="container">
         @if (TempData["message"] != null)

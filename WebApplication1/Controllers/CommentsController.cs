@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShoppingCart.Application.Interfaces;
@@ -21,6 +22,8 @@ namespace WebApplication1.Controllers
             _submissionService = submissionService;
             _logger = logger;
         }
+
+        [Authorize]
         public IActionResult Index(Guid id)
         {
             var commentList = _commentService.GetComments(id);
@@ -28,6 +31,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Create(Guid id)
         {
             var comments = _commentService.GetComments(id);
@@ -36,6 +40,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Create(CommentViewModel data, Guid id)
         {
             var comments = _commentService.GetComments(id);

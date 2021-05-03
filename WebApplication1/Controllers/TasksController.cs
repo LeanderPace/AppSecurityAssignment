@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,12 +30,14 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "teacher")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "teacher")]
         public IActionResult Create(TaskViewModel data)
         {
             data.email = User.Identity.Name;
@@ -53,6 +56,7 @@ namespace WebApplication1.Controllers
             }
         }
 
+        [Authorize(Roles = "teacher")]
         public IActionResult Delete(Guid id)
         {
             try
