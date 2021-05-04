@@ -29,9 +29,17 @@ namespace WebApplication1.Controllers
             _host = host;
             _logger = logger;
         }
-        public IActionResult Index()
+        public IActionResult TeacherSubmissions(Guid id)
         {
-            var submissionList = _submissionService.GetSubmissions();
+            var submissionList = _submissionService.GetSubmissionsForTeacher(id);
+            return View(submissionList);
+        }
+
+        public IActionResult StudentSubmission()
+        {
+            string email = User.Identity.Name;
+
+            var submissionList = _submissionService.GetSubmissionsForStudent(email);
             return View(submissionList);
         }
 
@@ -55,8 +63,6 @@ namespace WebApplication1.Controllers
 
                 if(data.task.deadline > DateTime.Now)
                 {
-                    data.task = _tasksService.GetTask(id);
-
                     string uniqueFilename;
 
                     if (System.IO.Path.GetExtension(file.FileName) == ".pdf" && file.Length < 1048576)

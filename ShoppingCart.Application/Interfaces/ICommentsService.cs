@@ -10,7 +10,7 @@ namespace ShoppingCart.Application.Interfaces
     {
         IQueryable<CommentViewModel> GetComments(Guid id);
         CommentViewModel GetComment(Guid id);
-        void AddComment(CommentViewModel model, DateTime dateCreated);
+        void AddComment(CommentViewModel model, DateTime dateCreated, string commenterEmail);
         void DeleteComment(Guid id);
     }
 }

@@ -13,6 +13,8 @@ namespace ShoppingCart.Application.ViewModels
 
         public DateTime commentDate { get; set; }
 
+        public string commenterEmail { get; set; }
+
         public SubmissionViewModel submission { get; set; }
     }
 }

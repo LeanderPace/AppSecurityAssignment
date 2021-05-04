@@ -44,9 +44,14 @@ namespace ShoppingCart.Application.Services
             }
         }
 
-        public IQueryable<SubmissionViewModel> GetSubmissions()
+        public IQueryable<SubmissionViewModel> GetSubmissionsForStudent(string email)
         {
-            return _submissionRepo.GetSubmissions().ProjectTo<SubmissionViewModel>(_autoMapper.ConfigurationProvider);
+            return _submissionRepo.GetSubmissions().Where(e => e.email == email).ProjectTo<SubmissionViewModel>(_autoMapper.ConfigurationProvider);
+        }
+
+        public IQueryable<SubmissionViewModel> GetSubmissionsForTeacher(Guid id)
+        {
+            return _submissionRepo.GetSubmissions().Where(e => e.task.id == id).ProjectTo<SubmissionViewModel>(_autoMapper.ConfigurationProvider);
         }
     }
 }

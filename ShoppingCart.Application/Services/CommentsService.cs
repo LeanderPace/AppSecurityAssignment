@@ -21,12 +21,13 @@ namespace ShoppingCart.Application.Services
             _autoMapper = autoMapper;
             _commentRepo = commentRepo;
         }
-        public void AddComment(CommentViewModel model, DateTime createdDate)
+        public void AddComment(CommentViewModel model, DateTime createdDate, string commenterEmail)
         {
             var comm = _autoMapper.Map<Comment>(model);
             comm.SubmissionId = comm.submission.id;
             comm.submission = null; 
             comm.commentDate = createdDate;
+            comm.commenterEmail = commenterEmail;
 
             _commentRepo.AddComment(comm);
         }

@@ -45,8 +45,6 @@ namespace WebApplication1
              .AddDefaultUI()
              .AddDefaultTokenProviders();
 
-
-
             services.AddControllersWithViews();
             services.AddRazorPages();
 

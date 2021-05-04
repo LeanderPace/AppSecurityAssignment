@@ -32,6 +32,7 @@
                     {
                         <a>@Html.ActionLink("Delete", "delete", "tasks", new { id = item.id })</a>
                         <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
+                        <a>@Html.ActionLink("Check submissions", "teachersubmissions", "submissions", new { id = item.id })</a>
                     }
 
                     @if (User.IsInRole("student"))

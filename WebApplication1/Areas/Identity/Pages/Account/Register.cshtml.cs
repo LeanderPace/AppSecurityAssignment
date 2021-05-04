@@ -83,7 +83,7 @@ namespace WebApplication1.Areas.Identity.Pages.Account
 
                     SendEmail(Input.Email, Input.Password);
 
-                    _logger.LogInformation("User created a new account with password.");
+                    /*_logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -104,7 +104,7 @@ namespace WebApplication1.Areas.Identity.Pages.Account
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
-                    }
+                    }*/
 
                    
                 }
@@ -125,8 +125,10 @@ namespace WebApplication1.Areas.Identity.Pages.Account
 
             MailMessage message = new MailMessage(from, to);
 
-            string mailbody = "Password is: " + password;
-            message.Subject = "Sending Email Using Asp.Net & C#";
+            string bodyContent = "You student account have just been created. Please login in using the following \n\nEmail: " + toEmail + "\nPassword: " + password;
+
+            string mailbody = bodyContent;
+            message.Subject = "Student Account";
             message.Body = mailbody;
             message.BodyEncoding = Encoding.UTF8;
             message.IsBodyHtml = true;
@@ -148,18 +150,32 @@ namespace WebApplication1.Areas.Identity.Pages.Account
         }
         public string RandomString()
         {
-            int size = 5;
+            int length = 7;
 
-            StringBuilder builder = new StringBuilder();
-            Random random = new Random();
-            char ch;
-            for (int i = 0; i < size; i++)
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string specialChars = "#@&%!*^$";
+            const string numbers = "0123456789";
+
+            StringBuilder sb = new StringBuilder();
+            Random rnd = new Random();
+
+            for (int i = 0; i < length; i++)
             {
-                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
-                builder.Append(ch);
+                int index = rnd.Next(chars.Length);
+                sb.Append(chars[index]);
             }
-            
-            return builder.ToString();
+            for (int i = 0; i < 2; i++)
+            {
+                int index = rnd.Next(numbers.Length);
+                sb.Append(numbers[index]);
+            }
+            for (int i = 0; i < 1; i++)
+            {
+                int index = rnd.Next(specialChars.Length);
+                sb.Append(specialChars[index]);
+            }
+
+            return sb.ToString();
         }
     }
 }

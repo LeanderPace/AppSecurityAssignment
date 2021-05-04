@@ -48,11 +48,13 @@ namespace WebApplication1.Controllers
 
             DateTime createdDate = System.DateTime.Now;
 
+            string commenterEmail = User.Identity.Name;
+
             if (ModelState.IsValid)
             {
                 data.submission = _submissionService.GetSubmission(id);
 
-                _commentService.AddComment(data, createdDate);
+                _commentService.AddComment(data, createdDate, commenterEmail);
                 
                 TempData["Message"] = "Comment posted successfully";
                 return View();
