@@ -7,6 +7,7 @@ namespace ShoppingCart.Application.Interfaces
 {
     public interface IMembersService
     {
+        MemberViewModel GetMember(string email);
         void AddMember(MemberViewModel m);
     }
 }

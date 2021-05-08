@@ -30,14 +30,14 @@
                 <div class="card-body">
                     @if (User.IsInRole("teacher"))
                     {
-                        <a>@Html.ActionLink("Delete", "delete", "tasks", new { id = item.id })</a>
+                        <a>@Html.ActionLink("Delete", "delete", "tasks", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })</a>
                         <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
-                        <a>@Html.ActionLink("Check submissions", "teachersubmissions", "submissions", new { id = item.id })</a>
+                        <a>@Html.ActionLink("Check submissions", "teachersubmissions", "submissions", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })</a>
                     }
 
                     @if (User.IsInRole("student"))
                     {
-                        <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
+                        <a>@Html.ActionLink("Submit", "create", "submissions", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })</a>
                     }
 
                 </div>

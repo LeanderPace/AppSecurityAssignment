@@ -13,5 +13,8 @@ namespace ShoppingCart.Application.ViewModels
         [Required(ErrorMessage ="Name cannot be left empty")]
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string LecturerEmail { get; set; }
+        public string PublicKey { get; set; }
+        public string PrivateKey { get; set; }
     }
 }

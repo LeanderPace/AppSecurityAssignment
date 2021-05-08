@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using ShoppingCart.Application.Interfaces;
 using ShoppingCart.Application.ViewModels;
 using WebApplication1.Models;
+using WebApplication1.Utility;
 
 namespace WebApplication1.Controllers
 {
@@ -18,20 +19,25 @@ namespace WebApplication1.Controllers
     {
         private readonly ISubmissionsService _submissionService;
         private readonly ITasksService _tasksService;
+        private readonly IMembersService _membersService;
         private readonly IWebHostEnvironment _host;
         private readonly ILogger<SubmissionsController> _logger;
 
-        public SubmissionsController(ISubmissionsService submissionService, ITasksService tasksService, 
-            IWebHostEnvironment host, ILogger<SubmissionsController> logger)
+        public SubmissionsController(ISubmissionsService submissionService, ITasksService tasksService,
+            IWebHostEnvironment host, ILogger<SubmissionsController> logger, IMembersService membersService)
         {
             _submissionService = submissionService;
             _tasksService = tasksService;
+            _membersService = membersService;
             _host = host;
             _logger = logger;
         }
-        public IActionResult TeacherSubmissions(Guid id)
+        public IActionResult TeacherSubmissions(string id)
         {
-            var submissionList = _submissionService.GetSubmissionsForTeacher(id);
+            string urlEnc = Encryption.SymmetricDecrypt(id);
+            Guid decId = Guid.Parse(urlEnc);
+
+            var submissionList = _submissionService.GetSubmissionsForTeacher(decId);
             return View(submissionList);
         }
 
@@ -54,12 +60,16 @@ namespace WebApplication1.Controllers
         [Authorize]
         [ValidateAntiForgeryToken]
         //[Authorize]
-        public IActionResult Create(IFormFile file, SubmissionViewModel data, Guid id)
+        public IActionResult Create(IFormFile file, SubmissionViewModel data, string id)
         {
+            string urlEnc = Encryption.SymmetricDecrypt(id);
+            Guid decId = Guid.Parse(urlEnc);
 
-            if (ModelState.IsValid)
-            {
-                data.task = _tasksService.GetTask(id);
+            var memId = _membersService.GetMember(User.Identity.Name);
+
+            //if (ModelState.IsValid)
+            //{
+                data.task = _tasksService.GetTask(decId);
 
                 if(data.task.deadline > DateTime.Now)
                 {
@@ -70,6 +80,8 @@ namespace WebApplication1.Controllers
                         byte[] whiteList = new byte[] { 37, 80, 68, 70 };
                         if (file != null)
                         {
+                            MemoryStream ms = new MemoryStream();
+
                             using (var f = file.OpenReadStream())
                             {
                                 byte[] buffer = new byte[4];
@@ -81,7 +93,7 @@ namespace WebApplication1.Controllers
                                     { }
                                     else
                                     {
-                                        ModelState.AddModelError("file", "file is not valid and accapteable");
+                                        ModelState.AddModelError("file", "Invalid file");
                                         return View();
                                     }
                                 }
@@ -91,14 +103,13 @@ namespace WebApplication1.Controllers
                                 uniqueFilename = Guid.NewGuid() + Path.GetExtension(file.FileName);
                                 data.file = uniqueFilename;
 
-                                string absolutePath = _host.WebRootPath + @"\files" + uniqueFilename;
+                                string absolutePath =  @"ValuablesFiles\" + uniqueFilename;
 
                                 try
                                 {
-                                    using (FileStream fsOut = new FileStream(absolutePath, FileMode.CreateNew, FileAccess.Write))
-                                    {
-                                        f.CopyTo(fsOut);
-                                    }
+                                    file.CopyTo(ms);
+                                    var encFile = Encryption.HybridEncrypt(ms, memId.PublicKey);
+                                    System.IO.File.WriteAllBytes(absolutePath, encFile.ToArray());
                                     f.Close();
                                 }
                                 catch (Exception ex)
@@ -129,13 +140,35 @@ namespace WebApplication1.Controllers
                     return View();
                 }
     
-            }
-            else
-            {
-                ModelState.AddModelError("", "Check your input. Operation failed");
-                return View(data);
-            }
+            //}
+            //else
+            //{
+            //    ModelState.AddModelError("", "Check your input. Operation failed");
+            //    return View(data);
+            //}
         }
+
+        public IActionResult DownloadFile(string id)
+        {
+            //try
+            //{
+                string urlEnc = Encryption.SymmetricDecrypt(id);
+                Guid decId = Guid.Parse(urlEnc);
+
+                var subId = _submissionService.GetSubmission(decId);
+                string absolutePath = @"ValuableFiles\" + subId.file;
+
+                FileStream fs = new FileStream(absolutePath, FileMode.Open, FileAccess.Read);
+                MemoryStream ms = new MemoryStream();
+
+                fs.CopyTo(ms);
+
+                var member = _membersService.GetMember(subId.email);
+                MemoryStream downloadedFile = Encryption.HybridDecrypt(ms, member.PrivateKey);
+
+                return File(downloadedFile, "application/ocet-stream", Guid.NewGuid() + ".pdf");
+            //}
+        } 
 
         [Authorize]
         public IActionResult Details(Guid id)

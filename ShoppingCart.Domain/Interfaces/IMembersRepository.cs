@@ -7,6 +7,7 @@ namespace ShoppingCart.Domain.Interfaces
 {
     public interface IMembersRepository
     {
+        Member GetMember(string email);
         void AddMember(Member m);
     }
 }

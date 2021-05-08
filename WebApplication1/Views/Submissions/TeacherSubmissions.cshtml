@@ -14,7 +14,7 @@
     {
         <div class="col-8 mt-2">
             <div class="list-group">
-                <a href="submissions/Details?id=@item.id" class="list-group-item list-group-item-action">
+                <a href="Details?id=@item.id" class="list-group-item list-group-item-action">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">@item.task.taskName</h5>
                         <small>@item.email</small>
@@ -26,7 +26,8 @@
         </div>
         <div class="col-4">
             <!--<a href="comments/create?id=@item.id" class="btn btn-primary">View/Post Comments</a>-->
-            @Html.ActionLink("Comments", "Create", "Comments", new { id = item.id })
+            @Html.ActionLink("Comments", "Create", "Comments", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })
+            @Html.ActionLink("Download", "DownloadFile", "Submissions", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })
         </div>
     }
 </div>

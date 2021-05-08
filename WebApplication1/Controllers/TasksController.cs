@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShoppingCart.Application.Interfaces;
 using ShoppingCart.Application.ViewModels;
+using WebApplication1.Utility;
 
 namespace WebApplication1.Controllers
 {
@@ -57,13 +58,16 @@ namespace WebApplication1.Controllers
         }
 
         [Authorize(Roles = "teacher")]
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(string id)
         {
             try
             {
-                _taskService.DeleteTask(id);
+                string urlEnc = Encryption.SymmetricDecrypt(id);
+                Guid decId = Guid.Parse(urlEnc);
+
+                _taskService.DeleteTask(decId);
                 TempData["feedback"] = "Product was deleted successfully";
-                _logger.LogInformation("Successfully Deleted Task " + id);
+                _logger.LogInformation("Successfully Deleted Task " + decId);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

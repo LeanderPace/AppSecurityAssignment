@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShoppingCart.Application.Interfaces;
 using ShoppingCart.Application.ViewModels;
+using WebApplication1.Utility;
 
 namespace WebApplication1.Controllers
 {
@@ -23,47 +24,52 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        [Authorize]
+        /*[Authorize]
         public IActionResult Index(Guid id)
         {
             var commentList = _commentService.GetComments(id);
             return View(commentList);
-        }
+        }*/
 
         [HttpGet]
         [Authorize]
-        public IActionResult Create(Guid id)
+        public IActionResult Create(string id)
         {
-            var comments = _commentService.GetComments(id);
+            string urlEnc = Encryption.SymmetricDecrypt(id);
+            Guid decId = Guid.Parse(urlEnc);
+            var comments = _commentService.GetComments(decId);
             ViewBag.Comments = comments;
             return View();
         }
 
         [HttpPost]
         [Authorize]
-        public IActionResult Create(CommentViewModel data, Guid id)
+        public IActionResult Create(CommentViewModel data, string id)
         {
-            var comments = _commentService.GetComments(id);
+            string urlEnc = Encryption.SymmetricDecrypt(id);
+            Guid decId = Guid.Parse(urlEnc);
+
+            var comments = _commentService.GetComments(decId);
             ViewBag.Comments = comments;
 
             DateTime createdDate = System.DateTime.Now;
 
             string commenterEmail = User.Identity.Name;
 
-            if (ModelState.IsValid)
-            {
-                data.submission = _submissionService.GetSubmission(id);
+            //if (ModelState.IsValid)
+            //{
+                data.submission = _submissionService.GetSubmission(decId);
 
                 _commentService.AddComment(data, createdDate, commenterEmail);
                 
                 TempData["Message"] = "Comment posted successfully";
                 return View();
-            }
-            else
-            {
-                ModelState.AddModelError("", "Error posting comment");
-                return View(data);
-            }
+            //}
+            //else
+            //{
+            //    ModelState.AddModelError("", "Error posting comment");
+            //    return View(data);
+            //}
         }
     }
 }

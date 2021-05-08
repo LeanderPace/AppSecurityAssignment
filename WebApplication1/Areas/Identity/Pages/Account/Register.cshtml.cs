@@ -14,7 +14,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using ShoppingCart.Application.Interfaces;
+using ShoppingCart.Application.ViewModels;
 using WebApplication1.Models;
+using WebApplication1.Utility;
+using static WebApplication1.Utility.Encryption;
 
 namespace WebApplication1.Areas.Identity.Pages.Account
 {
@@ -23,17 +27,20 @@ namespace WebApplication1.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMembersService _membersService;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            IMembersService membersService,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _membersService = membersService;
             _logger = logger;
             _emailSender = emailSender;
         }
@@ -80,6 +87,22 @@ namespace WebApplication1.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, "student");
+
+                    AsymmetricKeys encKeys = new AsymmetricKeys();
+                    encKeys = GenerateAsymmetricKeys();
+
+                    MemberViewModel member = new MemberViewModel
+                    {
+                        Email = Input.Email,
+                        FirstName = Input.FirstName,
+                        LastName = Input.LastName,
+                        LecturerEmail = User.Identity.Name,
+                        PublicKey = encKeys.PublicKey,
+                        PrivateKey = encKeys.PrivateKey
+                    };
+
+                    _membersService.AddMember(member);
 
                     SendEmail(Input.Email, Input.Password);
 
@@ -106,7 +129,7 @@ namespace WebApplication1.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }*/
 
-                   
+
                 }
                 foreach (var error in result.Errors)
                 {
@@ -125,7 +148,7 @@ namespace WebApplication1.Areas.Identity.Pages.Account
 
             MailMessage message = new MailMessage(from, to);
 
-            string bodyContent = "You student account have just been created. Please login in using the following \n\nEmail: " + toEmail + "\nPassword: " + password;
+            string bodyContent = "Your student account has just been created. Please log in using the following \n\nEmail: " + toEmail + "\nPassword: " + password;
 
             string mailbody = bodyContent;
             message.Subject = "Student Account";
