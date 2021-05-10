@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShoppingCart.Application.Interfaces;
 using ShoppingCart.Application.ViewModels;
+using WebApplication1.ActionFilters;
 using WebApplication1.Models;
 using WebApplication1.Utility;
 
@@ -32,28 +34,55 @@ namespace WebApplication1.Controllers
             _host = host;
             _logger = logger;
         }
+
         public IActionResult TeacherSubmissions(string id)
         {
-            string urlEnc = Encryption.SymmetricDecrypt(id);
-            Guid decId = Guid.Parse(urlEnc);
+            try
+            {
+                string urlEnc = Encryption.SymmetricDecrypt(id);
+                Guid decId = Guid.Parse(urlEnc);
 
-            var submissionList = _submissionService.GetSubmissionsForTeacher(decId);
-            return View(submissionList);
+                var submissionList = _submissionService.GetSubmissionsForTeacher(decId);
+                return View(submissionList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
+        [ViewOwnWork]
         public IActionResult StudentSubmission()
         {
-            string email = User.Identity.Name;
+            try
+            {
+                string email = User.Identity.Name;
 
-            var submissionList = _submissionService.GetSubmissionsForStudent(email);
-            return View(submissionList);
+                var submissionList = _submissionService.GetSubmissionsForStudent(email);
+                return View(submissionList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                return RedirectToAction("Error", "Home");
+            }
+
         }
 
         [HttpGet]
         [Authorize]
         public IActionResult Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [HttpPost]
@@ -62,16 +91,18 @@ namespace WebApplication1.Controllers
         //[Authorize]
         public IActionResult Create(IFormFile file, SubmissionViewModel data, string id)
         {
-            string urlEnc = Encryption.SymmetricDecrypt(id);
-            Guid decId = Guid.Parse(urlEnc);
+            try
+            {
+                string urlEnc = Encryption.SymmetricDecrypt(id);
+                Guid decId = Guid.Parse(urlEnc);
 
-            var memId = _membersService.GetMember(User.Identity.Name);
+                var memId = _membersService.GetMember(User.Identity.Name);
 
-            //if (ModelState.IsValid)
-            //{
+                //if (ModelState.IsValid)
+                //{
                 data.task = _tasksService.GetTask(decId);
 
-                if(data.task.deadline > DateTime.Now)
+                if (data.task.deadline > DateTime.Now)
                 {
                     string uniqueFilename;
 
@@ -94,7 +125,8 @@ namespace WebApplication1.Controllers
                                     else
                                     {
                                         ModelState.AddModelError("file", "Invalid file");
-                                        return View();
+                                        _logger.LogError("Invalid file |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                                        return View(); 
                                     }
                                 }
 
@@ -103,19 +135,19 @@ namespace WebApplication1.Controllers
                                 uniqueFilename = Guid.NewGuid() + Path.GetExtension(file.FileName);
                                 data.file = uniqueFilename;
 
-                                string absolutePath =  @"ValuablesFiles\" + uniqueFilename;
+                                string absolutePath = @"ValuableFiles\" + uniqueFilename;
 
                                 try
                                 {
                                     file.CopyTo(ms);
                                     var encFile = Encryption.HybridEncrypt(ms, memId.PublicKey);
+                                    data.signature = Encryption.SignData(ms, memId.PrivateKey);
                                     System.IO.File.WriteAllBytes(absolutePath, encFile.ToArray());
                                     f.Close();
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogError(ex, "Error happend while saving file");
-
+                                    _logger.LogError(ex, "Error happend while saving file |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                                     return View("Error", new ErrorViewModel() { Message = "Error while saving the file. Try again later" });
                                 }
                             }
@@ -123,7 +155,8 @@ namespace WebApplication1.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("file", "File is not valid and acceptable or size is greater than 10Mb");
+                        ModelState.AddModelError("file", "File is not valid or size is greater than 10Mb");
+                        _logger.LogError("File is not valid or size is greater than 10Mb |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                         return View();
                     }
 
@@ -132,14 +165,23 @@ namespace WebApplication1.Controllers
                     _submissionService.AddSubmission(data);
 
                     TempData["message"] = "Document submitted successfully";
+                    _logger.LogInformation("File uploaded successfully | ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                     return View();
                 }
                 else
                 {
                     TempData["error"] = "Deadline date overdue";
+                    _logger.LogError("Deadline date overdue |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                     return View();
                 }
-    
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                return RedirectToAction("Error");
+            }
+
+
             //}
             //else
             //{
@@ -148,10 +190,11 @@ namespace WebApplication1.Controllers
             //}
         }
 
+        [Authorize]
         public IActionResult DownloadFile(string id)
         {
-            //try
-            //{
+            try
+            {
                 string urlEnc = Encryption.SymmetricDecrypt(id);
                 Guid decId = Guid.Parse(urlEnc);
 
@@ -167,24 +210,39 @@ namespace WebApplication1.Controllers
                 MemoryStream downloadedFile = Encryption.HybridDecrypt(ms, member.PrivateKey);
 
                 return File(downloadedFile, "application/ocet-stream", Guid.NewGuid() + ".pdf");
-            //}
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                return RedirectToAction("Error");
+            }
         } 
 
         [Authorize]
-        public IActionResult Details(Guid id)
+        public IActionResult Details(string id)
         {
             try
             {
-                _logger.LogInformation("Accessing Information of Submission " + id);
-                var mySubmission = _submissionService.GetSubmission(id);
+                string urlEnc = Encryption.SymmetricDecrypt(id);
+                Guid decId = Guid.Parse(urlEnc);
+
+                _logger.LogInformation("Accessing Information of Submission |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                var mySubmission = _submissionService.GetSubmission(decId);
                 return View(mySubmission);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                 return RedirectToAction("Error");
             }
 
+        }
+
+        public static string GetIpAddress()
+        {
+            IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress[] addr = ipEntry.AddressList;
+            return addr[1].ToString();
         }
     }
 }

@@ -16,6 +16,8 @@ namespace ShoppingCart.Application.ViewModels
 
         public string file { get; set; }
 
+        public string signature { get; set; }
+
         public TaskViewModel task { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -26,34 +27,61 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
-            var taskList = _taskService.GetTasks();
-            return View(taskList);
+            try
+            {
+                var taskList = _taskService.GetTasks();
+                return View(taskList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                return RedirectToAction("Error", "Home");
+            }
+
         }
 
         [HttpGet]
         [Authorize(Roles = "teacher")]
         public IActionResult Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "teacher")]
         public IActionResult Create(TaskViewModel data)
         {
-            data.email = User.Identity.Name;
-
-            if (ModelState.IsValid)
+            try
             {
-                _taskService.AddTask(data);
+                data.email = User.Identity.Name;
 
-                TempData["Message"] = "Task created successfully";
-                return View();
+                if (ModelState.IsValid)
+                {
+                    _taskService.AddTask(data);
+
+                    TempData["Message"] = "Task created successfully";
+                    _logger.LogInformation("Task created successfully |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                    return View();
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Error creating task");
+                    _logger.LogError("Error creating task |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                    return View(data);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error creating task");
-                return View(data);
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                return RedirectToAction("Error");
             }
         }
 
@@ -67,16 +95,21 @@ namespace WebApplication1.Controllers
 
                 _taskService.DeleteTask(decId);
                 TempData["feedback"] = "Product was deleted successfully";
-                _logger.LogInformation("Successfully Deleted Task " + decId);
+                _logger.LogInformation("Successfully Deleted Task |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 TempData["danger"] = "Something went wrong";
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                 return RedirectToAction("Index");
             }
         }
-        
+        public static string GetIpAddress()
+        {
+            IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress[] addr = ipEntry.AddressList;
+            return addr[1].ToString();
+        }
     }
 }

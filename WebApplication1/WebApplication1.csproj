@@ -6,11 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="ValuableFiles\1ee4062a-e6c6-4b0e-bef2-d705d3cfd346.pdf" />
-    <Content Include="ValuableFiles\88f604c2-85c8-4709-ad4b-687c7a400288.pdf" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.1.12" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.9" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.13" />
@@ -30,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ValuableFiles\" />
     <Folder Include="wwwroot\files\" />
     <Folder Include="wwwroot\pictures\" />
   </ItemGroup>
