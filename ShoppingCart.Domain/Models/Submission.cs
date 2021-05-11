@@ -12,16 +12,22 @@ namespace ShoppingCart.Domain.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid id { get; set; }
 
+        [Required]
         public string studentName { get; set; }
 
+        [Required]
         public string studentSurname { get; set; }
 
+        [Required]
         public string email { get; set; }
 
+        [Required]
         public string file { get; set; }
 
+        [Required]
         public string signature { get; set; }
 
+        [Required]
         public virtual Task task { get; set; }
 
         [ForeignKey("Task")]

@@ -49,6 +49,7 @@ namespace WebApplication1.Controllers
         [HttpPost]
         [Authorize]
         [Comments]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(CommentViewModel data, string id)
         {
             try
@@ -59,24 +60,16 @@ namespace WebApplication1.Controllers
                 var comments = _commentService.GetComments(decId);
                 ViewBag.Comments = comments;
 
-                DateTime createdDate = System.DateTime.Now;
+                DateTime createdDate = DateTime.Now;
 
                 string commenterEmail = User.Identity.Name;
 
-                //if (ModelState.IsValid)
-                //{
                 data.submission = _submissionService.GetSubmission(decId);
 
                 _commentService.AddComment(data, createdDate, commenterEmail);
 
                 TempData["Message"] = "Comment posted successfully";
                 return View();
-                //}
-                //else
-                //{
-                //    ModelState.AddModelError("", "Error posting comment");
-                //    return View(data);
-                //}
             }
             catch (Exception ex)
             {

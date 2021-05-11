@@ -51,6 +51,7 @@ namespace ShoppingCart.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("content")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
@@ -131,18 +132,23 @@ namespace ShoppingCart.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("file")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("signature")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("studentName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("studentSurname")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");
@@ -162,21 +168,26 @@ namespace ShoppingCart.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("issueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("surname")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("taskName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("id");

@@ -175,6 +175,8 @@ namespace WebApplication1.Areas.Identity.Pages.Account
 
                         await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
 
+                        await _userManager.AddToRoleAsync(user, "teacher");
+
                         return LocalRedirect(returnUrl);
                     }
                 }

@@ -17,19 +17,34 @@ namespace WebApplication1.Controllers
     public class TasksController : Controller
     {
         private readonly ITasksService _taskService;
+        private readonly IMembersService _membersService;
         private readonly ILogger<TasksController> _logger;
 
-        public TasksController(ITasksService taskService, ILogger<TasksController> logger)
+        public TasksController(ITasksService taskService, IMembersService membersService, ILogger<TasksController> logger)
         {
             _taskService = taskService;
+            _membersService = membersService;
             _logger = logger;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             try
             {
-                var taskList = _taskService.GetTasks();
+                string email;
+
+                if (User.IsInRole("teacher"))
+                {
+                    email = User.Identity.Name;
+                }
+                else
+                {
+                    var member = _membersService.GetMember(User.Identity.Name);
+                    email = member.LecturerEmail;
+                }
+
+                var taskList = _taskService.GetTasks(email);
                 return View(taskList);
             }
             catch (Exception ex)
@@ -57,6 +72,7 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         [Authorize(Roles = "teacher")]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(TaskViewModel data)
         {
             try
@@ -65,11 +81,19 @@ namespace WebApplication1.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    _taskService.AddTask(data);
+                    if(data.deadline > DateTime.Now || data.deadline < data.issueDate)
+                    {
+                        _taskService.AddTask(data);
 
-                    TempData["Message"] = "Task created successfully";
-                    _logger.LogInformation("Task created successfully |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
-                    return View();
+                        TempData["Message"] = "Task created successfully";
+                        _logger.LogInformation("Task created successfully |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                        return View();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("deadline", "Incorrect deadline date");
+                        return View(data);
+                    }         
                 }
                 else
                 {

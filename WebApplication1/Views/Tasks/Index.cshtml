@@ -15,7 +15,7 @@
 <div class="row">
     @foreach (var item in Model)
     {
-        <div class="col-4">
+        <div class="col-4 mt-3">
             <div class="card" style="width: 18rem;">
                 <div class="card-body">
                     <h5 class="card-title">@item.taskName</h5>
@@ -27,23 +27,32 @@
                     <li class="list-group-item">Lecturer Name: @item.name @item.surname</li>
                     <li class="list-group-item">Lecturer Email: @item.email</li>
                 </ul>
-                <div class="card-body">
-                    @if (User.IsInRole("teacher"))
-                    {
-                        <a>@Html.ActionLink("Delete", "delete", "tasks", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })</a>
-                        <a>@Html.ActionLink("Submit", "create", "submissions", new { id = item.id })</a>
-                        <a>@Html.ActionLink("Check submissions", "teachersubmissions", "submissions", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })</a>
-                    }
+                @if (User.IsInRole("teacher"))
+                {
+            <div class="card-body">
+                <a>@Html.ActionLink("Submissions", "teachersubmissions", "submissions", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })</a>
+                <a onclick="return confirm()">@Html.ActionLink("Delete", "delete", "tasks", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })</a>
 
-                    @if (User.IsInRole("student"))
-                    {
+            </div>
+                }
+
+                @if (User.IsInRole("student"))
+                {
+                    <div class="card-body">
                         <a>@Html.ActionLink("Submit", "create", "submissions", new { id = WebApplication1.Utility.Encryption.SymmetricEncrypt(item.id.ToString()) })</a>
-                    }
 
-                </div>
+                    </div>
+                }
+
             </div>
         </div>
     }
 </div>
+
+<script>
+    function confirm() {
+        alert("Are you want to delete this taks along with its current submissions?!");
+    }
+</script>
 
 

@@ -35,6 +35,7 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         public IActionResult TeacherSubmissions(string id)
         {
             try
@@ -98,96 +99,94 @@ namespace WebApplication1.Controllers
 
                 var memId = _membersService.GetMember(User.Identity.Name);
 
-                //if (ModelState.IsValid)
-                //{
-                data.task = _tasksService.GetTask(decId);
-
-                if (data.task.deadline > DateTime.Now)
+                if (file != null)
                 {
-                    string uniqueFilename;
+                    data.task = _tasksService.GetTask(decId);
 
-                    if (System.IO.Path.GetExtension(file.FileName) == ".pdf" && file.Length < 1048576)
+                    if (data.task.deadline > DateTime.Now)
                     {
-                        byte[] whiteList = new byte[] { 37, 80, 68, 70 };
-                        if (file != null)
+                        string uniqueFilename;
+
+                        if (System.IO.Path.GetExtension(file.FileName) == ".pdf" && file.Length < 1048576)
                         {
-                            MemoryStream ms = new MemoryStream();
-
-                            using (var f = file.OpenReadStream())
+                            byte[] whiteList = new byte[] { 37, 80, 68, 70 };
+                            if (file != null)
                             {
-                                byte[] buffer = new byte[4];
-                                f.Read(buffer, 0, 4);
+                                MemoryStream ms = new MemoryStream();
 
-                                for (int i = 0; i < whiteList.Length; i++)
+                                using (var f = file.OpenReadStream())
                                 {
-                                    if (whiteList[i] == buffer[i])
-                                    { }
-                                    else
+                                    byte[] buffer = new byte[4];
+                                    f.Read(buffer, 0, 4);
+
+                                    for (int i = 0; i < whiteList.Length; i++)
                                     {
-                                        ModelState.AddModelError("file", "Invalid file");
-                                        _logger.LogError("Invalid file |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
-                                        return View(); 
+                                        if (whiteList[i] == buffer[i])
+                                        { }
+                                        else
+                                        {
+                                            ModelState.AddModelError("file", "Invalid file");
+                                            _logger.LogError("Invalid file |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                                            return View();
+                                        }
                                     }
-                                }
 
-                                f.Position = 0;
+                                    f.Position = 0;
 
-                                uniqueFilename = Guid.NewGuid() + Path.GetExtension(file.FileName);
-                                data.file = uniqueFilename;
+                                    uniqueFilename = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                                    data.file = uniqueFilename;
 
-                                string absolutePath = @"ValuableFiles\" + uniqueFilename;
+                                    string absolutePath = @"ValuableFiles\" + uniqueFilename;
 
-                                try
-                                {
-                                    file.CopyTo(ms);
-                                    var encFile = Encryption.HybridEncrypt(ms, memId.PublicKey);
-                                    data.signature = Encryption.SignData(ms, memId.PrivateKey);
-                                    System.IO.File.WriteAllBytes(absolutePath, encFile.ToArray());
-                                    f.Close();
-                                }
-                                catch (Exception ex)
-                                {
-                                    _logger.LogError(ex, "Error happend while saving file |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
-                                    return View("Error", new ErrorViewModel() { Message = "Error while saving the file. Try again later" });
+                                    try
+                                    {
+                                        file.CopyTo(ms);
+                                        var encFile = Encryption.HybridEncrypt(ms, memId.PublicKey);
+                                        data.signature = Encryption.SignData(ms, memId.PrivateKey);
+                                        System.IO.File.WriteAllBytes(absolutePath, encFile.ToArray());
+                                        f.Close();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogError(ex, "Error happend while saving file |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                                        return View("Error", new ErrorViewModel() { Message = "Error while saving the file. Try again later" });
+                                    }
                                 }
                             }
                         }
+                        else
+                        {
+                            ModelState.AddModelError("file", "File is not valid or size is greater than 10Mb");
+                            _logger.LogError("File is not valid or size is greater than 10Mb |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                            return View();
+                        }
+
+                        data.email = HttpContext.User.Identity.Name;
+
+                        _submissionService.AddSubmission(data);
+
+                        TempData["message"] = "Document submitted successfully";
+                        _logger.LogInformation("File uploaded successfully | ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                        return View();
                     }
                     else
                     {
-                        ModelState.AddModelError("file", "File is not valid or size is greater than 10Mb");
-                        _logger.LogError("File is not valid or size is greater than 10Mb |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
+                        TempData["error"] = "Deadline date overdue";
+                        _logger.LogError("Deadline date overdue |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                         return View();
                     }
-
-                    data.email = HttpContext.User.Identity.Name;
-
-                    _submissionService.AddSubmission(data);
-
-                    TempData["message"] = "Document submitted successfully";
-                    _logger.LogInformation("File uploaded successfully | ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
-                    return View();
                 }
                 else
                 {
-                    TempData["error"] = "Deadline date overdue";
-                    _logger.LogError("Deadline date overdue |" + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
-                    return View();
+                    ModelState.AddModelError("file", "Check your input. Operation failed");
+                    return View(data);
                 }
-            }
+            }   
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message + " ip: " + GetIpAddress() + " | Timestamp: " + DateTime.Now + " | Email: " + User.Identity.Name);
                 return RedirectToAction("Error");
             }
-
-
-            //}
-            //else
-            //{
-            //    ModelState.AddModelError("", "Check your input. Operation failed");
-            //    return View(data);
-            //}
         }
 
         [Authorize]
